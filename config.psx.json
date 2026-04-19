@@ -1,0 +1,23 @@
+{
+  "mode": "paper",
+  "symbols": ["OGDC", "LUCK", "MCB", "HBL", "ENGRO", "PSO"],
+  "initial_cash_pkr": 2000000,
+  "fee_pct": 0.002,
+  "slippage_pct": 0.001,
+  "bar_interval_seconds": 2,
+  "risk": {
+    "max_position_pct": 0.08,
+    "max_portfolio_drawdown_pct": 0.18,
+    "stop_loss_pct": 0.04,
+    "take_profit_pct": 0.09,
+    "min_cash_buffer_pct": 0.10,
+    "max_symbols": 8
+  },
+  "weights": {
+    "trend": 0.30,
+    "momentum": 0.25,
+    "reversion": 0.15,
+    "volatility": 0.15,
+    "liquidity": 0.15
+  }
+}

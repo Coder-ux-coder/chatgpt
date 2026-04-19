@@ -1,0 +1,31 @@
+{
+  "symbols": ["OGDC", "MCB", "HBL", "ENGRO", "PSO", "LUCK"],
+  "initial_cash_pkr": 2000000,
+  "seed": 42,
+  "execution": {
+    "fee_pct": 0.0018,
+    "slippage_pct": 0.0012,
+    "lot_size": 1
+  },
+  "risk": {
+    "max_position_pct": 0.10,
+    "max_gross_exposure_pct": 0.80,
+    "max_portfolio_drawdown_pct": 0.20,
+    "min_cash_pct": 0.08,
+    "stop_loss_atr_mult": 2.2,
+    "trailing_stop_atr_mult": 2.8,
+    "take_profit_atr_mult": 4.0,
+    "max_holding_bars": 70,
+    "max_positions": 8,
+    "min_signal_to_enter": 0.12,
+    "min_signal_to_add": 0.18
+  },
+  "alpha": {
+    "trend": 0.30,
+    "momentum": 0.25,
+    "mean_reversion": 0.15,
+    "volatility_penalty": 0.10,
+    "liquidity": 0.10,
+    "breakout": 0.10
+  }
+}

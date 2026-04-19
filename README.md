@@ -1,65 +1,82 @@
-# PSX Autonomous Stock AI Trader
+# PSX Autonomous Trader (Detailed, Fully Runnable)
 
-A detailed Python trading bot focused **only on Pakistan Stock Exchange (PSX)** symbols.
+This is a **Pakistan Stock Exchange (PSX)-only** autonomous trading framework with:
 
-## What it includes
+- detailed multi-factor alpha model,
+- position sizing based on volatility (ATR),
+- portfolio-level risk controls,
+- deterministic backtesting,
+- built-in sample-data generation so it runs end-to-end immediately.
 
-- Autonomous buy/sell decisions from a multi-factor signal engine:
-  - Trend (SMA relationship)
-  - Momentum
-  - RSI mean reversion
-  - Volatility penalty
-  - Liquidity/volume scoring
-- Built-in risk controls:
-  - Position size caps
-  - Portfolio drawdown guard
-  - Stop-loss, trailing stop, take-profit
-  - Minimum cash buffer
-- Portfolio logic:
-  - Top-N signal ranking
-  - Rebalancing and de-risking weak symbols
-- Brokerage simulation:
-  - Paper trading ledger
-  - Fees and slippage modeling
-  - P&L, equity, position tracking
-- Modes:
-  - Backtest mode from CSV OHLCV data
-  - Simulated live loop (replace feed with real PSX data + broker API)
+> Default mode is paper/backtest. No real broker orders are sent unless you add broker integration.
+
+## Algorithm (detailed)
+
+The strategy combines several layers:
+
+1. **Regime filter**
+   - Uses SMA-20 vs SMA-50 spread to estimate bullish/bearish market regime.
+   - Regime scales alpha aggression up/down.
+
+2. **Multi-factor alpha score**
+   - Trend (price vs SMA-50)
+   - Momentum (SMA-10 vs SMA-30)
+   - Mean reversion (RSI-14)
+   - Volatility penalty (std dev)
+   - Liquidity impulse (volume vs 20-bar mean)
+   - Breakout pressure (price vs 20-bar high)
+
+3. **Confidence-gated entries**
+   - Enter only if score crosses a minimum threshold.
+   - Add-on buys require a stronger threshold.
+
+4. **Risk sizing**
+   - Position size starts from max position % of equity.
+   - Adjusts by ATR-driven volatility normalization and signal confidence.
+
+5. **Exit engine**
+   - ATR hard stop
+   - ATR trailing stop
+   - ATR take-profit partial
+   - Time stop (max holding bars)
+   - Weak-alpha de-risking (reduce size on negative signal)
+
+6. **Portfolio guardrails**
+   - Max gross exposure cap
+   - Min cash reserve
+   - Max position count
+   - Drawdown kill-switch (halts new entries when breached)
 
 ## Files
 
-- `psx_autonomous_trader.py` — full bot implementation
-- `config.psx.json` — strategy/risk configuration
+- `psx_autonomous_trader.py` — full engine, backtest runner, sample-data generator.
+- `config.psx.json` — symbols + risk/alpha/execution tuning.
 
-## Expected data format for backtesting
+## Quick start (works immediately)
 
-Create one CSV per symbol in `data/`:
-
-`data/OGDC.csv` (example)
-
-```csv
-ts,open,high,low,close,volume
-2026-01-02T09:30:00+05:00,218.0,219.5,217.5,219.0,120000
-2026-01-02T09:35:00+05:00,219.0,220.1,218.7,219.9,98000
-```
-
-## Usage
-
-Backtest:
+### 1) Generate sample PSX-like data
 
 ```bash
-python3 psx_autonomous_trader.py --mode backtest --data-dir data --config config.psx.json
+python3 psx_autonomous_trader.py --generate-sample-data --data-dir data --config config.psx.json --bars 1200
 ```
 
-Simulated live loop:
+### 2) Run backtest
 
 ```bash
-python3 psx_autonomous_trader.py --mode live --config config.psx.json
+python3 psx_autonomous_trader.py --data-dir data --config config.psx.json
 ```
 
-## Important safety/legal note
+You’ll get a metrics JSON including:
+- return %, CAGR %, max drawdown,
+- sharpe-like score,
+- win rate, profit factor,
+- trade count, turnover,
+- kill-switch status.
 
-This project is educational and defaults to paper trading. If you connect it to real execution:
-- validate logic with long forward testing,
-- add production-grade monitoring and kill switches,
-- ensure compliance with PSX and SECP rules and your broker's terms.
+## Real PSX usage notes
+
+To use this with real execution:
+- replace/extend data feed with real PSX market data,
+- implement a broker adapter in `PaperBroker` style,
+- add operational controls (circuit breaker, order reconciliation, alerting),
+- ensure compliance with broker terms and SECP/PSX regulations.
